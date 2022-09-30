@@ -10,7 +10,7 @@ replaces=('apple-bcm-wifi-firmware')
 makedepends=("python3" "tar")
 source=("https://mirror.funami.tech/arch-mact2/firmware/bluetooth.tar.gz"
 	"https://mirror.funami.tech/arch-mact2/firmware/wifi.tar.gz"
-	"asahi-installer::git+https://github.com/AsahiLinux/asahi-installer#commit=d08345d94194dc810319172871a9ba06f77da9bd")
+	"asahi-installer::git+https://github.com/NoaHimesaka1873/asahi-installer")
 sha256sums=('SKIP'
             'SKIP'
             'SKIP')
