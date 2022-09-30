@@ -1,0 +1,62 @@
+name: Build Package
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+    - name: Build In Docker
+      if: ${{ !contains(github.event.head_commit.message, '[no build]') }}
+      run: |
+        BUILDUSER=mahirooyama
+        BUILDGROUP=onimai
+        HOSTNAME=onimai-i-am-now-your-sister
+        cat << EOF > entrypoint.sh
+        cd /build
+        groupadd -r $BUILDGROUP
+        useradd $BUILDUSER -g $BUILDGROUP -m
+        passwd -d $BUILDUSER
+        pacman -Syu --noconfirm --needed sudo base-devel git
+        printf '$BUILDUSER ALL=(ALL) ALL\\n' | tee -a /etc/sudoers
+        chown -R $BUILDUSER:$BUILDGROUP ./
+        sudo -u $BUILDUSER gpg --keyserver keyserver.ubuntu.com --recv-keys 38DBBDC86092693E
+        sudo -u $BUILDUSER bash -c 'export MAKEFLAGS=j\$(nproc) && makepkg -s --noconfirm'
+        EOF
+
+        docker run -h $HOSTNAME -t -v $PWD:/build archlinux /bin/bash /build/entrypoint.sh
+
+    - name: Print sha512sums
+      if: ${{ !contains(github.event.head_commit.message, '[no build]') }}
+      run: sha512sum *.pkg.tar.*
+
+    - name: Upload Built Packages
+      if: ${{ !contains(github.event.head_commit.message, '[no build]') }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: built-packages
+        path: ${{ github.workspace }}/*.pkg.tar.*
+
+    - name: Create Tag
+      if: ${{ !contains(github.event.head_commit.message, '[no rel]') && !contains(github.event.head_commit.message, '[no build]') }}
+      id: create_tag
+      run: |
+        source PKGBUILD
+        echo "::set-output name=tag::${pkgver}"
+        echo $pkgver $pkgrel
+    - name: Release
+      if: ${{ !contains(github.event.head_commit.message, '[no rel]') && !contains(github.event.head_commit.message, '[no build]') }}
+      uses: softprops/action-gh-release@v1
+      with:
+         files: |
+           ${{ github.workspace }}/*.zip
+           ${{ github.workspace }}/*.pkg.tar.*
+         tag_name: v${{ steps.create_tag.outputs.tag }}
+         name: ${{ steps.create_tag.outputs.tag }}
+         draft: ${{ contains(github.event.head_commit.message, '[draft]') }}
+         prerelease: ${{ contains(github.event.head_commit.message, '[prerel]') }}
+         body: |
+          Install packages with `sudo pacman -U <file>`, you can use urls or file paths.
+      env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
