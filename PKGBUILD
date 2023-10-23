@@ -18,6 +18,7 @@ build() {
     cd asahi-installer
     mkdir ../firmware-wifi
     mkdir ../firmware-bluetooth
+    ls .. -l
     python3 -m asahi_firmware.wifi ../wifi ../firmware-wifi
     python3 -m asahi_firmware.bluetooth ../bluetooth ../firmware-bluetooth
 }
