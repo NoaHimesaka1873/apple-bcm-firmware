@@ -1,6 +1,6 @@
 # Maintainer: Noa Himesaka <himesaka@noa.codes>
 pkgname=apple-bcm-firmware
-pkgver=13.0 #monterey is macOS 12, probably change this to whatever macos version you got fw from
+pkgver=14.0 #monterey is macOS 12, probably change this to whatever macos version you got fw from
 pkgrel=1
 pkgdesc="Wi-Fi and Bluetooth Firmware from macOS Big Sur for T2 and M1 Macs"
 arch=("any")
@@ -15,9 +15,9 @@ sha256sums=('SKIP'
             'SKIP'
             'SKIP')
 build() {
-    cd asahi-installer/src
-    python3 -m asahi_firmware.wifi ../../wifi ../../firmware-wifi.tar
-    python3 -m asahi_firmware.bluetooth ../../bluetooth ../../firmware-bluetooth.tar
+    cd asahi-installer
+    python3 -m asahi_firmware.wifi ../wifi ../firmware-wifi.tar
+    python3 -m asahi_firmware.bluetooth ../bluetooth ../firmware-bluetooth.tar
 }
 package() {
     mkdir -p $pkgdir/usr/lib/firmware
