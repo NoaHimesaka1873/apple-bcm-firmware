@@ -11,16 +11,21 @@ makedepends=("python3" "tar")
 source=("https://mirror.funami.tech/arch-mact2/firmware/bluetooth.tar.gz"
 	"https://mirror.funami.tech/arch-mact2/firmware/wifi.tar.gz"
 	"asahi-installer::git+https://github.com/NoaHimesaka1873/asahi-installer")
+noextract=("bluetooth.tar.gz"
+	   "wifi.tar.gz")
 sha256sums=('SKIP'
             'SKIP'
             'SKIP')
 build() {
     cd asahi-installer
+    mkdir wifi
+    mkdir bluetooth
+    tar xf ../wifi.tar.gz --directory wifi/
+    tar xf ../bluetooth.tar.gz --directory bluetooth/
     mkdir ../firmware-wifi
     mkdir ../firmware-bluetooth
-    ls .. -l
-    python3 -m asahi_firmware.wifi ../wifi ../firmware-wifi
-    python3 -m asahi_firmware.bluetooth ../bluetooth ../firmware-bluetooth
+    python3 -m asahi_firmware.wifi wifi ../firmware-wifi
+    python3 -m asahi_firmware.bluetooth bluetooth ../firmware-bluetooth
 }
 package() {
     mkdir -p $pkgdir/usr/lib/firmware
