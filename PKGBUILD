@@ -16,12 +16,14 @@ sha256sums=('SKIP'
             'SKIP')
 build() {
     cd asahi-installer
-    python3 -m asahi_firmware.wifi ../wifi ../firmware-wifi.tar
-    python3 -m asahi_firmware.bluetooth ../bluetooth ../firmware-bluetooth.tar
+    mkdir ../firmware-wifi
+    mkdir ../firmware-bluetooth
+    python3 -m asahi_firmware.wifi ../wifi ../firmware-wifi
+    python3 -m asahi_firmware.bluetooth ../bluetooth ../firmware-bluetooth
 }
 package() {
     mkdir -p $pkgdir/usr/lib/firmware
     cd $pkgdir/usr/lib/firmware
-    tar xf $srcdir/firmware-wifi.tar
-    tar xf $srcdir/firmware-bluetooth.tar
+    tar xf $srcdir/firmware-wifi/firmware.tar
+    tar xf $srcdir/firmware-bluetooth/firmware.tar
 }
